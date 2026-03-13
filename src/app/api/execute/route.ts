@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import nlp from "@/services/ai/nlp";
 
 const API_KEY = process.env.FOURSQUARE_API;
 const VALID_CODE = "pioneerdevai";
@@ -18,15 +19,20 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Invalid access code" }, { status: 401 });
         }
 
-        // TODO: Interpret the user’s message into structured search parameters
-        const query = "cheap sushi restaurant";
-        const near = "downtown Los Angeles";
+        const structuredQuery = await nlp(message);
+
+        if (!structuredQuery) {
+            return NextResponse.json({ error: "Could not interpret query" }, { status: 400 });
+        }
 
         const url = new URL("https://places-api.foursquare.com/places/search");
 
-        url.searchParams.set("query", query);
-        url.searchParams.set("open_now", "true");
-        url.searchParams.set("near", near);
+        url.searchParams.set("query", structuredQuery.query);
+        url.searchParams.set("open_now", structuredQuery.openNow.toString());
+
+        if (structuredQuery.near) {
+            url.searchParams.set("near", structuredQuery.near);
+        }
 
         const response = await fetch(url.toString(), {
             method: "GET",
