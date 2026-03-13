@@ -25,12 +25,17 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Could not interpret query" }, { status: 400 });
         }
 
+        console.log("STRUCTURED QUERY", JSON.stringify(structuredQuery, null, 2));
+
         const url = new URL("https://places-api.foursquare.com/places/search");
 
         url.searchParams.set("query", structuredQuery.query);
-        url.searchParams.set("open_now", structuredQuery.openNow.toString());
 
-        if (structuredQuery.near) {
+        if (structuredQuery.openNow != null) {
+            url.searchParams.set("open_now", structuredQuery.openNow.toString());
+        }
+
+        if (structuredQuery.near != null) {
             url.searchParams.set("near", structuredQuery.near);
         }
 
