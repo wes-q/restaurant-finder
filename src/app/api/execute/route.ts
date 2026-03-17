@@ -28,11 +28,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         if (code !== getValidCode()) {
             return NextResponse.json({ error: "Invalid access code" }, { status: 401 });
         }
-        // if (code !== VALID_CODE) {
-        //     return NextResponse.json({ error: "Invalid access code" }, { status: 401 });
-        // }
 
         const structuredQuery: StructuredQuery = await parseMessage(message);
+
         if (!structuredQuery) {
             return NextResponse.json({ error: "Could not interpret query" }, { status: 400 });
         }

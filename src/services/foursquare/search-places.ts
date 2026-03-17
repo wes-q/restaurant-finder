@@ -3,9 +3,8 @@ import { type Place, type StructuredQuery, PlaceSchema } from "@/types/place";
 import { z } from "zod";
 import { PLACE_FIELDS } from "@/types/place";
 
-const API_KEY = process.env.FOURSQUARE_API;
-
 export async function searchPlaces(structuredQuery: StructuredQuery): Promise<Place[]> {
+    const API_KEY = process.env.FOURSQUARE_API;
     if (!API_KEY) {
         throw new Error("FOURSQUARE_API key is missing from .env");
     }
