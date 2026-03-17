@@ -1,5 +1,5 @@
 import "server-only";
-import type { Place, StructuredQuery } from "@/types/foursquare";
+import type { Place, StructuredQuery } from "@/types/place";
 
 const API_KEY = process.env.FOURSQUARE_API;
 

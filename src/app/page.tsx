@@ -21,14 +21,22 @@ export default function QueryTraditionalReact() {
             setError("Message is required");
             return;
         }
-
+        console.log("handleSubmit called");
         try {
+            console.log("try block entered");
             setLoading(true);
             setError(null);
             const { places } = await executeApi(query);
             setPlaces(places);
         } catch (err) {
-            setError("Failed to fetch api results");
+            console.log("ERR", err);
+            if (err instanceof TypeError && err.message === "Failed to fetch") {
+                setError("Network error. Please check your connection.");
+            } else if (err instanceof Error && err.message) {
+                setError(err.message);
+            } else {
+                setError("Something went wrong.");
+            }
         } finally {
             setLoading(false);
         }

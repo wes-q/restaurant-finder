@@ -7,6 +7,7 @@ import type { StructuredQuery, Place } from "@/types/place";
 const VALID_CODE = process.env.API_ACCESS_CODE;
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
+    console.log("API ROUTE RUNS HERE");
     try {
         const { searchParams } = new URL(req.url);
         const message: string | null = searchParams.get("message");
