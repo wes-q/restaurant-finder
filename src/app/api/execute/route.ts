@@ -1,15 +1,16 @@
+import "server-only";
 import { NextRequest, NextResponse } from "next/server";
-import nlp from "@/services/ai/nlp";
+import { parseMessage } from "@/services/ai/parse-message";
+import { searchPlaces } from "@/services/foursquare/search-places";
+import type { StructuredQuery, Place } from "@/types/place";
 
-const API_KEY = process.env.FOURSQUARE_API;
-const VALID_CODE = "pioneerdevai";
+const VALID_CODE = process.env.API_ACCESS_CODE;
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
     try {
         const { searchParams } = new URL(req.url);
-
-        const message = searchParams.get("message");
-        const code = searchParams.get("code");
+        const message: string | null = searchParams.get("message");
+        const code: string | null = searchParams.get("code");
 
         if (!message) {
             return NextResponse.json({ error: "Missing message parameter" }, { status: 400 });
@@ -19,48 +20,19 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Invalid access code" }, { status: 401 });
         }
 
-        const structuredQuery = await nlp(message);
-
+        const structuredQuery: StructuredQuery = await parseMessage(message);
         if (!structuredQuery) {
             return NextResponse.json({ error: "Could not interpret query" }, { status: 400 });
         }
+        console.log("Structured Query:", JSON.stringify(structuredQuery, null, 2));
 
-        console.log("STRUCTURED QUERY", JSON.stringify(structuredQuery, null, 2));
+        const places: Place[] = await searchPlaces(structuredQuery);
+        console.log("FSQ Response:", JSON.stringify(places, null, 2));
 
-        const url = new URL("https://places-api.foursquare.com/places/search");
-
-        url.searchParams.set("query", structuredQuery.query);
-
-        if (structuredQuery.openNow != null) {
-            url.searchParams.set("open_now", structuredQuery.openNow.toString());
-        }
-
-        if (structuredQuery.near != null) {
-            url.searchParams.set("near", structuredQuery.near);
-        }
-
-        const response = await fetch(url.toString(), {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${API_KEY}`,
-                "X-Places-Api-Version": "2025-06-17",
-                Accept: "application/json",
-            },
-        });
-
-        const data = await response.json();
-
-        return NextResponse.json({
-            success: true,
-            message,
-            results: data,
-        });
-    } catch (error) {
-        return NextResponse.json(
-            {
-                error: "Internal server error",
-            },
-            { status: 500 },
-        );
+        return NextResponse.json({ success: true, message, places });
+    } catch (error: unknown) {
+        console.error("API route error:", error);
+        const message = error instanceof Error ? error.message : "Internal server error";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
