@@ -4,7 +4,13 @@ import { parseMessage } from "@/services/ai/parse-message";
 import { searchPlaces } from "@/services/foursquare/search-places";
 import type { StructuredQuery, Place } from "@/types/place";
 
-const VALID_CODE = process.env.API_ACCESS_CODE;
+// for vitest
+function getValidCode(): string {
+    if (!process.env.API_ACCESS_CODE) {
+        throw new Error("API_ACCESS_CODE is not configured");
+    }
+    return process.env.API_ACCESS_CODE;
+}
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
     try {
@@ -16,9 +22,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
             return NextResponse.json({ error: "Missing message parameter" }, { status: 400 });
         }
 
-        if (code !== VALID_CODE) {
+        if (!code) {
+            return NextResponse.json({ error: "Missing access code" }, { status: 400 });
+        }
+        if (code !== getValidCode()) {
             return NextResponse.json({ error: "Invalid access code" }, { status: 401 });
         }
+        // if (code !== VALID_CODE) {
+        //     return NextResponse.json({ error: "Invalid access code" }, { status: 401 });
+        // }
 
         const structuredQuery: StructuredQuery = await parseMessage(message);
         if (!structuredQuery) {
