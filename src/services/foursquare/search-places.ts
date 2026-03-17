@@ -1,5 +1,6 @@
 import "server-only";
-import type { Place, StructuredQuery } from "@/types/place";
+import { type Place, type StructuredQuery, PlaceSchema } from "@/types/place";
+import { z } from "zod";
 
 const API_KEY = process.env.FOURSQUARE_API;
 
@@ -30,5 +31,17 @@ export async function searchPlaces(structuredQuery: StructuredQuery): Promise<Pl
     });
 
     const data = await response.json();
-    return data.results;
+
+    const places = data.results.map((place: any) => ({
+        fsq_place_id: place.fsq_place_id,
+        name: place.name,
+        website: place.website,
+        categories: place.categories,
+        distance: place.distance,
+        tel: place.tel,
+        email: place.email,
+        formatted_address: place.location?.formatted_address,
+    }));
+
+    return z.array(PlaceSchema).parse(places);
 }

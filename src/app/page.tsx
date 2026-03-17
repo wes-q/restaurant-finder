@@ -1,41 +1,41 @@
 "use client";
 
-import { useState } from "react";
-import { type SubmitEventHandler } from "react";
+import { useState, type SubmitEventHandler } from "react";
 import { executeApi } from "@/lib/executeApi";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldDescription } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Place } from "@/types/place";
 import { Spinner } from "@/components/ui/spinner";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { MapPin, Phone, Globe } from "lucide-react";
 
-export default function QueryTraditionalReact() {
+export default function QueryPage() {
     const [places, setPlaces] = useState<Place[]>([]);
     const [query, setQuery] = useState("");
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
         event.preventDefault();
 
-        if (typeof query !== "string" || query.trim() === "") {
+        if (!query.trim()) {
             setError("Message is required");
             return;
         }
-        console.log("handleSubmit called");
+
         try {
-            console.log("try block entered");
             setLoading(true);
             setError(null);
             const { places } = await executeApi(query);
             setPlaces(places);
         } catch (err) {
-            console.log("ERR", err);
             if (err instanceof TypeError && err.message === "Failed to fetch") {
                 setError("Network error. Please check your connection.");
             } else if (err instanceof Error && err.message.includes("500")) {
-                setError("Server error. Our service is temporarily unavailable. Please try again later.");
-            } else if (err instanceof Error && err.message) {
+                setError("Server error. Please try again later.");
+            } else if (err instanceof Error) {
                 setError(err.message);
             } else {
                 setError("Something went wrong.");
@@ -46,30 +46,85 @@ export default function QueryTraditionalReact() {
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <Field className="p-2">
-                    <FieldDescription>Enter your message below.</FieldDescription>
-                    <Textarea name="message" placeholder="Find me a cheap sushi restaurant in downtown Los Angeles that's open now." value={query} onChange={(e) => setQuery(e.target.value)} />
-                    <Button type="submit" disabled={loading}>
-                        {loading ? "Searching..." : "Send message"}
+        <div className="max-w-2xl mx-auto space-y-6">
+            {/* FORM */}
+            <Card className="p-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <Field>
+                        <FieldDescription>Describe what you're looking for</FieldDescription>
+
+                        <Textarea name="message" placeholder="Find me a cheap sushi restaurant nearby..." value={query} onChange={(e) => setQuery(e.target.value)} className="min-h-[100px]" />
+                    </Field>
+
+                    <Button type="submit" disabled={loading} className="w-full">
+                        {loading ? "Searching..." : "Search Places"}
                     </Button>
-                    {error && <p className="text-red-500">{error}</p>}
-                </Field>
-            </form>
-            <div className="p-2">
-                <h1 className="text-xl">Places</h1>
-                <div className="bg-white text-black h-full min-h-36 rounded-lg p-2">
-                    {loading ? (
-                        <div className="flex justify-center items-center min-h-36">
-                            <Spinner />
-                        </div>
-                    ) : places.length > 0 ? (
-                        places.map((place) => <div key={place.fsq_place_id}>{place.name}</div>)
-                    ) : (
-                        <p className="text-gray-400">No places found.</p>
-                    )}
-                </div>
+
+                    {error && <p className="text-sm text-red-500">{error}</p>}
+                </form>
+            </Card>
+
+            {/* RESULTS */}
+            <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Places</h2>
+
+                {loading ? (
+                    <div className="flex justify-center items-center py-10">
+                        <Spinner />
+                    </div>
+                ) : places.length === 0 ? (
+                    <Card className="p-6 text-center text-muted-foreground">No places found.</Card>
+                ) : (
+                    places.map((place) => (
+                        <Card key={place.fsq_place_id} className="p-4">
+                            <CardContent className="p-0 space-y-3">
+                                {/* Name */}
+                                <div className="flex justify-between items-start">
+                                    <h3 className="font-semibold text-lg">{place.name}</h3>
+                                </div>
+
+                                {(place.categories ?? []).length > 0 && (
+                                    <div className="flex flex-wrap gap-2">
+                                        {(place.categories ?? []).map((cat) => (
+                                            <Badge key={cat.fsq_category_id} variant="secondary">
+                                                {cat.name}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Info */}
+                                <div className="space-y-1 text-sm text-muted-foreground">
+                                    {place.formatted_address && (
+                                        <div className="flex items-center gap-2">
+                                            <MapPin className="w-4 h-4" />
+                                            <span>{place.formatted_address}</span>
+                                        </div>
+                                    )}
+
+                                    {place.tel && (
+                                        <div className="flex items-center gap-2">
+                                            <Phone className="w-4 h-4" />
+                                            <span>{place.tel}</span>
+                                        </div>
+                                    )}
+
+                                    {place.website && (
+                                        <div className="flex items-center gap-2">
+                                            <Globe className="w-4 h-4" />
+                                            <a href={place.website} target="_blank" className="underline">
+                                                Visit website
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Distance */}
+                                <div className="text-xs text-muted-foreground">Distance: {place.distance} meters</div>
+                            </CardContent>
+                        </Card>
+                    ))
+                )}
             </div>
         </div>
     );
