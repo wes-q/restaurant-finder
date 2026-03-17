@@ -15,10 +15,15 @@ export const PlaceSchema = z.object({
     distance: z.number().optional(),
     tel: z.string().optional(),
     email: z.string().optional(),
-    formatted_address: z.string().optional(),
+    // formatted_address: z.string().optional(),
+    location: z.object({
+        formatted_address: z.string().optional(),
+    }),
 });
 
 export type Place = z.infer<typeof PlaceSchema>;
+
+export const PLACE_FIELDS = Object.keys(PlaceSchema.shape).join(",");
 
 export const StructuredQuerySchema = z.object({
     query: z.string().trim().min(1, "Query is required"),

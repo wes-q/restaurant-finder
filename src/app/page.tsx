@@ -95,10 +95,10 @@ export default function QueryPage() {
 
                                 {/* Info */}
                                 <div className="space-y-1 text-sm text-muted-foreground">
-                                    {place.formatted_address && (
+                                    {place.location?.formatted_address && (
                                         <div className="flex items-center gap-2">
                                             <MapPin className="w-4 h-4" />
-                                            <span>{place.formatted_address}</span>
+                                            <span>{place.location.formatted_address}</span>
                                         </div>
                                     )}
 

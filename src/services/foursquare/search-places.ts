@@ -1,6 +1,7 @@
 import "server-only";
 import { type Place, type StructuredQuery, PlaceSchema } from "@/types/place";
 import { z } from "zod";
+import { PLACE_FIELDS } from "@/types/place";
 
 const API_KEY = process.env.FOURSQUARE_API;
 
@@ -12,6 +13,7 @@ export async function searchPlaces(structuredQuery: StructuredQuery): Promise<Pl
     const url = new URL("https://places-api.foursquare.com/places/search");
 
     url.searchParams.set("query", structuredQuery.query);
+    url.searchParams.set("fields", PLACE_FIELDS);
 
     if (structuredQuery.openNow != null) {
         url.searchParams.set("open_now", structuredQuery.openNow.toString());
@@ -20,6 +22,8 @@ export async function searchPlaces(structuredQuery: StructuredQuery): Promise<Pl
     if (structuredQuery.near != null) {
         url.searchParams.set("near", structuredQuery.near);
     }
+
+    console.log("FSQ QUERY URL:", url);
 
     const response = await fetch(url.toString(), {
         method: "GET",
@@ -40,7 +44,8 @@ export async function searchPlaces(structuredQuery: StructuredQuery): Promise<Pl
         distance: place.distance,
         tel: place.tel,
         email: place.email,
-        formatted_address: place.location?.formatted_address,
+        // formatted_address: place.location?.formatted_address,
+        location: place.location,
     }));
 
     return z.array(PlaceSchema).parse(places);
