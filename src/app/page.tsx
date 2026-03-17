@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldDescription } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Place } from "@/types/place";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function QueryTraditionalReact() {
     const [places, setPlaces] = useState<Place[]>([]);
@@ -32,6 +33,8 @@ export default function QueryTraditionalReact() {
             console.log("ERR", err);
             if (err instanceof TypeError && err.message === "Failed to fetch") {
                 setError("Network error. Please check your connection.");
+            } else if (err instanceof Error && err.message.includes("500")) {
+                setError("Server error. Our service is temporarily unavailable. Please try again later.");
             } else if (err instanceof Error && err.message) {
                 setError(err.message);
             } else {
@@ -57,9 +60,15 @@ export default function QueryTraditionalReact() {
             <div className="p-2">
                 <h1 className="text-xl">Places</h1>
                 <div className="bg-white text-black h-full min-h-36 rounded-lg p-2">
-                    {places.map((place) => (
-                        <div key={place.fsq_place_id}>{place.name}</div>
-                    ))}
+                    {loading ? (
+                        <div className="flex justify-center items-center min-h-36">
+                            <Spinner />
+                        </div>
+                    ) : places.length > 0 ? (
+                        places.map((place) => <div key={place.fsq_place_id}>{place.name}</div>)
+                    ) : (
+                        <p className="text-gray-400">No places found.</p>
+                    )}
                 </div>
             </div>
         </div>
