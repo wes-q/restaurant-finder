@@ -53,7 +53,7 @@ export default function QueryPage() {
                     <Field>
                         <FieldDescription>Describe what you're looking for</FieldDescription>
 
-                        <Textarea name="message" placeholder="Find me a cheap sushi restaurant nearby..." value={query} onChange={(e) => setQuery(e.target.value)} className="min-h-[100px]" />
+                        <Textarea name="message" placeholder="Find me a cheap sushi restaurant nearby..." value={query} onChange={(e) => setQuery(e.target.value)} className="min-h-25" />
                     </Field>
 
                     <Button type="submit" disabled={loading} className="w-full">
