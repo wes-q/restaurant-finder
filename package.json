@@ -13,6 +13,7 @@
     "dependencies": {
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
+        "fuse.js": "^7.1.0",
         "lucide-react": "^0.577.0",
         "next": "16.1.6",
         "openai": "^6.27.0",

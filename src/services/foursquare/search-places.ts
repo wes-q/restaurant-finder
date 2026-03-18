@@ -2,6 +2,7 @@ import "server-only";
 import { type Place, type StructuredQuery, PlaceSchema } from "@/types/place";
 import { z } from "zod";
 import { PLACE_FIELDS } from "@/types/place";
+import { fuzzySearch } from "@/lib/fuzzy-search";
 
 export async function searchPlaces(structuredQuery: StructuredQuery): Promise<Place[]> {
     const API_KEY = process.env.FOURSQUARE_API;
@@ -10,10 +11,20 @@ export async function searchPlaces(structuredQuery: StructuredQuery): Promise<Pl
     }
 
     const url = new URL("https://places-api.foursquare.com/places/search");
+    const aiCategory = structuredQuery.category;
 
     url.searchParams.set("query", structuredQuery.query);
     url.searchParams.set("fields", PLACE_FIELDS);
     url.searchParams.set("sort", "RELEVANCE");
+    url.searchParams.set("limit", "50");
+
+    if (aiCategory != null) {
+        const categoryId = fuzzySearch(aiCategory);
+        url.searchParams.set("fsq_category_ids", categoryId);
+    } else {
+        // Default umbrella category for all "Dining and Drinking"
+        url.searchParams.set("fsq_category_ids", "63be6904847c3692a84b9bb5");
+    }
 
     if (structuredQuery.openNow != null) {
         url.searchParams.set("open_now", structuredQuery.openNow.toString());
@@ -23,7 +34,7 @@ export async function searchPlaces(structuredQuery: StructuredQuery): Promise<Pl
         url.searchParams.set("near", structuredQuery.near);
     }
 
-    console.log("FSQ QUERY URL:", url);
+    console.log("FSQ QUERY URL:", url.href);
 
     const response = await fetch(url.toString(), {
         method: "GET",
