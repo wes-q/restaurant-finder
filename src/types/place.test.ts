@@ -8,6 +8,9 @@ describe("StructuredQuerySchema Validation", () => {
             query: "restaurants",
             near: "Manila",
             openNow: true,
+            minPrice: null,
+            maxPrice: null,
+            category: null,
         };
 
         const result = StructuredQuerySchema.safeParse(input);
@@ -21,6 +24,9 @@ describe("StructuredQuerySchema Validation", () => {
             query: "",
             near: "Manila",
             openNow: true,
+            minPrice: null,
+            maxPrice: null,
+            category: null,
         };
 
         const result = StructuredQuerySchema.safeParse(input);
@@ -37,6 +43,9 @@ describe("StructuredQuerySchema Validation", () => {
             query: "   coffee   ",
             near: null,
             openNow: null,
+            minPrice: null,
+            maxPrice: null,
+            category: null,
         };
 
         const result = StructuredQuerySchema.parse(input);
@@ -50,6 +59,9 @@ describe("StructuredQuerySchema Validation", () => {
             query: "pizza",
             near: null,
             openNow: null,
+            minPrice: null,
+            maxPrice: null,
+            category: null,
         };
 
         const result = StructuredQuerySchema.safeParse(input);
@@ -74,6 +86,41 @@ describe("StructuredQuerySchema Validation", () => {
             query: "ramen",
             near: 123, // ❌ should be string or null
             openNow: "yes", // ❌ should be boolean or null
+            minPrice: null,
+            maxPrice: null,
+            category: null,
+        };
+
+        const result = StructuredQuerySchema.safeParse(input);
+
+        expect(result.success).toBe(false);
+    });
+
+    // ✅ 7. Valid price range
+    it("passes with valid price range", () => {
+        const input = {
+            query: "fine dining",
+            near: "Manila",
+            openNow: null,
+            minPrice: 3,
+            maxPrice: 4,
+            category: "Italian",
+        };
+
+        const result = StructuredQuerySchema.safeParse(input);
+
+        expect(result.success).toBe(true);
+    });
+
+    // ✅ 8. Invalid price range
+    it("fails if price is out of range", () => {
+        const input = {
+            query: "restaurant",
+            near: null,
+            openNow: null,
+            minPrice: 0, // ❌ should be 1-4
+            maxPrice: 5, // ❌ should be 1-4
+            category: null,
         };
 
         const result = StructuredQuerySchema.safeParse(input);
