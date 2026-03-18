@@ -13,6 +13,7 @@ export async function searchPlaces(structuredQuery: StructuredQuery): Promise<Pl
 
     url.searchParams.set("query", structuredQuery.query);
     url.searchParams.set("fields", PLACE_FIELDS);
+    url.searchParams.set("sort", "RELEVANCE");
 
     if (structuredQuery.openNow != null) {
         url.searchParams.set("open_now", structuredQuery.openNow.toString());
