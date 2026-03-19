@@ -10,7 +10,7 @@ Schema:
   "max_price": integer,  // Optional. 1 (most affordable) to 4 (most expensive)
   "open_now": boolean,   // Optional. True if the user wants only places currently open
   "near": string,        // Optional. Name of a city, town, or locality
-  "category": string,    // Optional. The cuisine or category of the restaurant 
+  "category": string,    // Optional. The type of food, cuisine, or dining concept the user is looking for. This can be: 1) A broad cuisine (e.g., "Japanese", "Italian", "Indian"). 2) A specific dish or specialty (e.g., "ramen", "sushi", "curry", "fried chicken") 3) A regional or sub-cuisine (e.g., "Bavarian", "Andhra", "Creole") 4) A restaurant type or concept (e.g., "gastropub", "buffet", "food truck")
 }
 
 Guidelines:
