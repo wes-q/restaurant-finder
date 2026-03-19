@@ -47,7 +47,7 @@ export default function QueryPage() {
 
     return (
         <div className="max-w-2xl mx-auto space-y-6">
-            {/* FORM */}
+            <h1 className="text-2xl my-10">🥨 Restaurant Finder</h1>
             <Card className="p-4">
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <Field>
@@ -57,7 +57,7 @@ export default function QueryPage() {
                     </Field>
 
                     <Button type="submit" disabled={loading} className="w-full">
-                        {loading ? "Searching..." : "Search Places"}
+                        {loading ? "Searching..." : "Search"}
                     </Button>
 
                     {error && <p className="text-sm text-red-500">{error}</p>}
@@ -66,14 +66,14 @@ export default function QueryPage() {
 
             {/* RESULTS */}
             <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Places</h2>
+                <h2 className="text-xl font-semibold">Restaurants:</h2>
 
                 {loading ? (
                     <div className="flex justify-center items-center py-10">
                         <Spinner />
                     </div>
                 ) : places.length === 0 ? (
-                    <Card className="p-6 text-center text-muted-foreground">No places found.</Card>
+                    <Card className="p-6 text-center text-muted-foreground">No restaurants found.</Card>
                 ) : (
                     places.map((place) => (
                         <Card key={place.fsq_place_id} className="p-4">
