@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseMessage } from "@/services/ai/parse-message";
 import { searchPlaces } from "@/services/foursquare/search-places";
 import type { StructuredQuery, Place } from "@/types/place";
+import { saveConversation } from "@/lib/saveConversation";
 
 // for vitest
 function getValidCode(): string {
@@ -30,11 +31,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         }
 
         const structuredQuery: StructuredQuery = await parseMessage(message);
-
         if (!structuredQuery) {
             return NextResponse.json({ error: "Could not interpret query" }, { status: 400 });
         }
         console.log("Structured Query:", JSON.stringify(structuredQuery, null, 2));
+
+        saveConversation(message, JSON.stringify(structuredQuery, null, 2));
+        console.log("Conversation saved");
 
         const places: Place[] = await searchPlaces(structuredQuery);
         // console.log("FSQ Response:", JSON.stringify(places, null, 2));

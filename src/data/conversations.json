@@ -1,0 +1,7 @@
+[
+  {
+    "timestamp": "2026-04-01T14:27:45.959Z",
+    "userInput": "find me a place where i can drink authentic matcha from japan in los angeles\n",
+    "aiResponse": "{\n  \"query\": \"authentic matcha from Japan\",\n  \"near\": \"Los Angeles\",\n  \"openNow\": null,\n  \"minPrice\": null,\n  \"maxPrice\": null,\n  \"category\": \"Japanese\"\n}"
+  }
+]
