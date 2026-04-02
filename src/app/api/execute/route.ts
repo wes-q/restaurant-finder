@@ -36,8 +36,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         }
         console.log("Structured Query:", JSON.stringify(structuredQuery, null, 2));
 
-        saveConversation(message, JSON.stringify(structuredQuery, null, 2));
-        console.log("Conversation saved");
+        const dbResponse = await saveConversation(message, JSON.stringify(structuredQuery, null, 2));
+        console.log("dbResponse", dbResponse);
 
         const places: Place[] = await searchPlaces(structuredQuery);
         // console.log("FSQ Response:", JSON.stringify(places, null, 2));
